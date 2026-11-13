@@ -1,0 +1,72 @@
+<mat-toolbar class="app-toolbar">
+  <a class="app-toolbar__brand" routerLink="/publicaciones" aria-label="Ir al inicio de Red Social">
+    <mat-icon aria-hidden="true">hub</mat-icon>
+    <span>Red Social</span>
+    @if (auth.currentUser()?.perfil === 'administrador') {
+      <span class="app-toolbar__rol" title="Sesión iniciada como administrador">Admin</span>
+    }
+  </a>
+
+  <span class="app-toolbar__spacer"></span>
+
+  @if (auth.isLoggedIn()) {
+    <nav class="app-toolbar__nav" aria-label="Navegación principal">
+      <a mat-button routerLink="/publicaciones" routerLinkActive="activo">
+        <mat-icon aria-hidden="true">dynamic_feed</mat-icon>
+        <span class="nav-label">Publicaciones</span>
+      </a>
+      <a mat-button routerLink="/mi-perfil" routerLinkActive="activo">
+        <mat-icon aria-hidden="true">person</mat-icon>
+        <span class="nav-label">Mi perfil</span>
+      </a>
+    </nav>
+
+    <button
+      mat-icon-button
+      [matMenuTriggerFor]="menuUsuario"
+      aria-label="Abrir menú de usuario"
+      class="app-toolbar__avatar-btn"
+    >
+      @if (auth.currentUser()?.imagenPerfil) {
+        <img
+          class="app-toolbar__avatar"
+          [src]="urlImagen(auth.currentUser()!.imagenPerfil)"
+          [alt]="'Foto de perfil de ' + auth.currentUser()!.nombreUsuario"
+        />
+      } @else {
+        <mat-icon aria-hidden="true">account_circle</mat-icon>
+      }
+    </button>
+
+    <mat-menu #menuUsuario="matMenu">
+      <div class="menu-usuario__cabecera">
+        <strong>{{ auth.currentUser()?.nombre }} {{ auth.currentUser()?.apellido }}</strong>
+        <span>&#64;{{ auth.currentUser()?.nombreUsuario }}</span>
+        @if (auth.currentUser()?.perfil === 'administrador') {
+          <mat-chip-set class="menu-usuario__rol">
+            <mat-chip highlighted>
+              <mat-icon matChipAvatar aria-hidden="true">verified_user</mat-icon>
+              Administrador
+            </mat-chip>
+          </mat-chip-set>
+        }
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item routerLink="/mi-perfil">
+        <mat-icon aria-hidden="true">person</mat-icon>
+        <span>Mi perfil</span>
+      </button>
+      <button mat-menu-item (click)="cerrarSesion()">
+        <mat-icon aria-hidden="true">logout</mat-icon>
+        <span>Cerrar sesión</span>
+      </button>
+    </mat-menu>
+  } @else {
+    <a mat-button routerLink="/login">Ingresar</a>
+    <a mat-flat-button color="primary" routerLink="/registro">Crear cuenta</a>
+  }
+</mat-toolbar>
+
+<main class="app-main">
+  <router-outlet />
+</main>

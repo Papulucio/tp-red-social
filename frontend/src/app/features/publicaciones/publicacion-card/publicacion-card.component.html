@@ -1,0 +1,110 @@
+<mat-card class="publicacion" appearance="outlined">
+  <div class="publicacion__cabecera">
+    <div class="publicacion__avatar">
+      @if (imagenAutor(post().autor)) {
+        <img [src]="imagenAutor(post().autor)" [alt]="'Foto de ' + nombreAutor(post().autor)" />
+      } @else {
+        <span aria-hidden="true">{{ inicialesAutor(post().autor) }}</span>
+      }
+    </div>
+    <div class="publicacion__autor">
+      <strong>{{ nombreAutor(post().autor) }}</strong>
+      <span>{{ usuarioAutor(post().autor) }}</span>
+    </div>
+    <span class="publicacion__fecha">{{ post().createdAt | date: 'short' }}</span>
+
+    @if (puedeEliminar()) {
+      <button
+        mat-icon-button
+        type="button"
+        class="publicacion__eliminar"
+        matTooltip="Eliminar publicación"
+        aria-label="Eliminar publicación"
+        (click)="eliminar()"
+      >
+        <mat-icon aria-hidden="true">delete_outline</mat-icon>
+      </button>
+    }
+  </div>
+
+  <mat-card-content class="publicacion__contenido">
+    <h3 class="publicacion__titulo">{{ post().titulo }}</h3>
+    <p class="publicacion__mensaje">{{ post().mensaje }}</p>
+    @if (post().imagenUrl) {
+      <img
+        class="publicacion__imagen"
+        [src]="urlImagen(post().imagenUrl)"
+        alt="Imagen de la publicación"
+        loading="lazy"
+      />
+    }
+  </mat-card-content>
+
+  <mat-card-actions class="publicacion__acciones">
+    <button
+      mat-button
+      type="button"
+      class="accion-like"
+      [class.activo]="dioLike()"
+      [disabled]="procesandoLike()"
+      (click)="toggleLike()"
+      [attr.aria-pressed]="dioLike()"
+      [attr.aria-label]="dioLike() ? 'Quitar me gusta' : 'Dar me gusta'"
+    >
+      <mat-icon aria-hidden="true">{{ dioLike() ? 'favorite' : 'favorite_border' }}</mat-icon>
+      <span>{{ post().meGusta.length }}</span>
+    </button>
+
+    <button mat-button type="button" (click)="alternarComentarios()" aria-label="Ver comentarios">
+      <mat-icon aria-hidden="true">chat_bubble_outline</mat-icon>
+      <span>{{ post().comentarios.length }}</span>
+    </button>
+  </mat-card-actions>
+
+  @if (mostrarComentarios()) {
+    <mat-divider />
+    <div class="comentarios">
+      @if (post().comentarios.length > 0) {
+        <ul class="comentarios__lista">
+          @for (comentario of post().comentarios; track comentario._id) {
+            <li class="comentarios__item">
+              <div class="comentarios__texto">
+                <strong>{{ nombreComentario(comentario) }}</strong>
+                <span>{{ comentario.texto }}</span>
+              </div>
+              <span class="comentarios__fecha">{{ comentario.fecha | date: 'short' }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="comentarios__vacio">Todavía no hay comentarios. ¡Sé el primero!</p>
+      }
+
+      <div class="comentarios__form">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Escribí un comentario</mat-label>
+          <input
+            matInput
+            [ngModel]="nuevoComentario()"
+            (ngModelChange)="nuevoComentario.set($event)"
+            (keyup.enter)="enviarComentario()"
+            maxlength="500"
+          />
+        </mat-form-field>
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          [disabled]="enviandoComentario() || !nuevoComentario().trim()"
+          (click)="enviarComentario()"
+        >
+          @if (enviandoComentario()) {
+            <mat-spinner diameter="18" aria-label="Enviando comentario" />
+          } @else {
+            Enviar
+          }
+        </button>
+      </div>
+    </div>
+  }
+</mat-card>

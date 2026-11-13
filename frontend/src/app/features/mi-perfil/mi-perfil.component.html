@@ -1,0 +1,92 @@
+<section class="app-container perfil">
+  @if (usuario(); as user) {
+    <mat-card class="perfil__card" appearance="outlined">
+      <div class="perfil__portada"></div>
+      <div class="perfil__cuerpo">
+        <div class="perfil__avatar">
+          @if (user.imagenPerfil) {
+            <img [src]="urlImagen(user.imagenPerfil)" [alt]="'Foto de perfil de ' + user.nombreUsuario" />
+          } @else {
+            <span aria-hidden="true">{{ user.nombre.charAt(0) }}{{ user.apellido.charAt(0) }}</span>
+          }
+        </div>
+
+        <div class="perfil__identidad">
+          <h1 class="perfil__nombre">{{ user.nombre }} {{ user.apellido }}</h1>
+          <span class="perfil__usuario">&#64;{{ user.nombreUsuario }}</span>
+        </div>
+
+        <button mat-flat-button color="primary" type="button" (click)="abrirEditar()">
+          <mat-icon aria-hidden="true">edit</mat-icon>
+          Editar perfil
+        </button>
+      </div>
+
+      <mat-divider />
+
+      <div class="perfil__datos">
+        <div class="perfil__dato">
+          <mat-icon aria-hidden="true">mail</mat-icon>
+          <div>
+            <span class="perfil__dato-label">Correo</span>
+            <span class="perfil__dato-valor">{{ user.correo }}</span>
+          </div>
+        </div>
+
+        <div class="perfil__dato">
+          <mat-icon aria-hidden="true">cake</mat-icon>
+          <div>
+            <span class="perfil__dato-label">Fecha de nacimiento</span>
+            <span class="perfil__dato-valor">{{ user.fechaNacimiento | date: 'longDate' }}</span>
+          </div>
+        </div>
+
+        <div class="perfil__dato">
+          <mat-icon aria-hidden="true">badge</mat-icon>
+          <div>
+            <span class="perfil__dato-label">Rol</span>
+            <mat-chip-set>
+              <mat-chip [highlighted]="user.perfil === 'administrador'">
+                {{ user.perfil === 'administrador' ? 'Administrador' : 'Usuario' }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+        </div>
+      </div>
+
+      <div class="perfil__descripcion">
+        <span class="perfil__dato-label">Descripción</span>
+        <p>{{ user.descripcion || 'Sin descripción todavía.' }}</p>
+      </div>
+    </mat-card>
+
+    <section class="perfil__publicaciones">
+      <header class="perfil__publicaciones-cabecera">
+        <mat-icon aria-hidden="true">collections_bookmark</mat-icon>
+        <h2>Mis últimas publicaciones</h2>
+      </header>
+
+      @if (cargando()) {
+        <div class="perfil__estado">
+          <mat-spinner diameter="40" aria-label="Cargando publicaciones" />
+        </div>
+      } @else if (publicaciones().length === 0) {
+        <mat-card class="perfil__vacio" appearance="outlined">
+          <mat-icon aria-hidden="true">post_add</mat-icon>
+          <p>Todavía no publicaste nada. ¡Animate a compartir!</p>
+        </mat-card>
+      } @else {
+        <div class="perfil__lista">
+          @for (publicacion of publicaciones(); track publicacion._id) {
+            <app-publicacion-card
+              [post]="publicacion"
+              [currentUser]="usuario()"
+              (actualizado)="actualizar($event)"
+              (eliminado)="eliminar($event)"
+            />
+          }
+        </div>
+      }
+    </section>
+  }
+</section>

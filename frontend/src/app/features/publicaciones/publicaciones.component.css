@@ -1,0 +1,80 @@
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feed__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.feed__titulo {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.feed__subtitulo {
+  margin: 4px 0 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.feed__barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.feed__contador {
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.feed__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.feed__estado {
+  display: flex;
+  justify-content: center;
+  padding: 64px 0;
+}
+
+.feed__vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 48px 24px;
+  border-radius: 18px;
+}
+
+.feed__vacio mat-icon {
+  font-size: 56px;
+  width: 56px;
+  height: 56px;
+  color: var(--mat-sys-primary);
+}
+
+.feed__vacio h2 {
+  margin: 8px 0 0;
+}
+
+.feed__vacio p {
+  margin: 0 0 12px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+mat-paginator {
+  border-radius: 14px;
+  background: var(--mat-sys-surface-container);
+}

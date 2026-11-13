@@ -1,0 +1,185 @@
+<div class="auth-page">
+  <mat-card class="auth-card" appearance="outlined">
+    <mat-card-header class="auth-card__header">
+      <div class="auth-card__logo" aria-hidden="true">
+        <mat-icon>person_add</mat-icon>
+      </div>
+      <mat-card-title>Crear cuenta</mat-card-title>
+      <mat-card-subtitle>Sumate a Red Social</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="enviar()" class="auth-form" novalidate>
+        <div class="foto-perfil">
+          <div class="foto-perfil__preview">
+            @if (previsualizacion()) {
+              <img [src]="previsualizacion()!" alt="Previsualización de la foto de perfil" />
+            } @else {
+              <mat-icon aria-hidden="true">account_circle</mat-icon>
+            }
+          </div>
+          <div class="foto-perfil__acciones">
+            <label class="foto-perfil__boton" for="imagenPerfil">
+              <mat-icon aria-hidden="true">upload</mat-icon>
+              Elegir imagen
+            </label>
+            <input
+              #imagenInput
+              id="imagenPerfil"
+              type="file"
+              accept="image/*"
+              class="foto-perfil__input"
+              (change)="seleccionarArchivo($event)"
+            />
+            @if (previsualizacion()) {
+              <button mat-button type="button" (click)="quitarImagen(imagenInput)">
+                Quitar
+              </button>
+            }
+          </div>
+          <p class="foto-perfil__ayuda">Opcional · JPG, PNG o WEBP · máx. 5 MB</p>
+        </div>
+
+        <div class="auth-form__grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" autocomplete="given-name" />
+            @if (nombre.touched && nombre.hasError('required')) {
+              <mat-error>El nombre es obligatorio</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Apellido</mat-label>
+            <input matInput formControlName="apellido" autocomplete="family-name" />
+            @if (apellido.touched && apellido.hasError('required')) {
+              <mat-error>El apellido es obligatorio</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Correo electrónico</mat-label>
+          <mat-icon matPrefix aria-hidden="true">mail</mat-icon>
+          <input matInput type="email" formControlName="correo" autocomplete="email" />
+          @if (correo.touched && correo.hasError('required')) {
+            <mat-error>El correo es obligatorio</mat-error>
+          }
+          @if (correo.touched && correo.hasError('email')) {
+            <mat-error>Ingresá un correo válido</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre de usuario</mat-label>
+          <mat-icon matPrefix aria-hidden="true">alternate_email</mat-icon>
+          <input matInput formControlName="nombreUsuario" autocomplete="username" />
+          @if (nombreUsuario.touched && nombreUsuario.hasError('required')) {
+            <mat-error>El nombre de usuario es obligatorio</mat-error>
+          }
+          @if (nombreUsuario.touched && nombreUsuario.hasError('pattern')) {
+            <mat-error>3 a 20 caracteres (letras, números, punto o guion bajo)</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="auth-form__grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Contraseña</mat-label>
+            <input
+              matInput
+              formControlName="password"
+              [type]="ocultarPassword() ? 'password' : 'text'"
+              autocomplete="new-password"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="ocultarPassword.set(!ocultarPassword())"
+              [attr.aria-label]="ocultarPassword() ? 'Mostrar contraseña' : 'Ocultar contraseña'"
+            >
+              <mat-icon aria-hidden="true">{{ ocultarPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (password.touched && password.hasError('required')) {
+              <mat-error>La contraseña es obligatoria</mat-error>
+            }
+            @if (password.touched && password.hasError('largo')) {
+              <mat-error>Mínimo 8 caracteres</mat-error>
+            }
+            @if (password.touched && password.hasError('mayuscula')) {
+              <mat-error>Debe incluir 1 mayúscula</mat-error>
+            }
+            @if (password.touched && password.hasError('numero')) {
+              <mat-error>Debe incluir 1 número</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Repetir contraseña</mat-label>
+            <input
+              matInput
+              formControlName="repetirPassword"
+              [type]="ocultarRepetir() ? 'password' : 'text'"
+              autocomplete="new-password"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="ocultarRepetir.set(!ocultarRepetir())"
+              [attr.aria-label]="ocultarRepetir() ? 'Mostrar contraseña' : 'Ocultar contraseña'"
+            >
+              <mat-icon aria-hidden="true">{{ ocultarRepetir() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (repetirPassword.touched && repetirPassword.hasError('required')) {
+              <mat-error>Repetí la contraseña</mat-error>
+            }
+            @if (repetirPassword.touched && repetirPassword.hasError('noCoinciden')) {
+              <mat-error>Las contraseñas no coinciden</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha de nacimiento</mat-label>
+          <mat-icon matPrefix aria-hidden="true">cake</mat-icon>
+          <input matInput type="date" formControlName="fechaNacimiento" />
+          @if (fechaNacimiento.touched && fechaNacimiento.hasError('required')) {
+            <mat-error>La fecha de nacimiento es obligatoria</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Descripción breve</mat-label>
+          <textarea
+            matInput
+            formControlName="descripcion"
+            rows="3"
+            maxlength="200"
+            placeholder="Contá algo sobre vos..."
+          ></textarea>
+          <mat-hint align="end">{{ descripcion.value?.length || 0 }}/200</mat-hint>
+        </mat-form-field>
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          class="auth-form__submit"
+          [disabled]="cargando()"
+        >
+          @if (cargando()) {
+            <mat-spinner diameter="20" aria-label="Creando cuenta" />
+          } @else {
+            Crear cuenta
+          }
+        </button>
+      </form>
+    </mat-card-content>
+
+    <mat-card-footer class="auth-card__footer">
+      <span>¿Ya tenés cuenta?</span>
+      <a mat-button color="primary" routerLink="/login">Iniciá sesión</a>
+    </mat-card-footer>
+  </mat-card>
+</div>

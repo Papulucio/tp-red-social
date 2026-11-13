@@ -1,0 +1,67 @@
+<section class="app-container feed">
+  <header class="feed__cabecera">
+    <div>
+      <h1 class="feed__titulo">Publicaciones</h1>
+      <p class="feed__subtitulo">Compartí y descubrí lo que publica la comunidad</p>
+    </div>
+    <button mat-flat-button color="primary" type="button" (click)="abrirCrear()">
+      <mat-icon aria-hidden="true">add</mat-icon>
+      Nueva publicación
+    </button>
+  </header>
+
+  <div class="feed__barra">
+    <mat-button-toggle-group
+      [value]="orden()"
+      (change)="cambiarOrden($event.value)"
+      aria-label="Ordenar publicaciones"
+    >
+      <mat-button-toggle value="fecha">
+        <mat-icon aria-hidden="true">schedule</mat-icon>
+        Más recientes
+      </mat-button-toggle>
+      <mat-button-toggle value="likes">
+        <mat-icon aria-hidden="true">trending_up</mat-icon>
+        Más populares
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <span class="feed__contador">{{ total() }} publicaciones</span>
+  </div>
+
+  @if (cargando()) {
+    <div class="feed__estado">
+      <mat-spinner diameter="44" aria-label="Cargando publicaciones" />
+    </div>
+  } @else if (publicaciones().length === 0) {
+    <mat-card class="feed__vacio" appearance="outlined">
+      <mat-icon aria-hidden="true">forum</mat-icon>
+      <h2>Todavía no hay publicaciones</h2>
+      <p>Sé el primero en compartir algo con la comunidad.</p>
+      <button mat-flat-button color="primary" type="button" (click)="abrirCrear()">
+        Crear la primera publicación
+      </button>
+    </mat-card>
+  } @else {
+    <div class="feed__lista">
+      @for (publicacion of publicaciones(); track publicacion._id) {
+        <app-publicacion-card
+          [post]="publicacion"
+          [currentUser]="auth.currentUser()"
+          (actualizado)="actualizar($event)"
+          (eliminado)="eliminar($event)"
+        />
+      }
+    </div>
+
+    <mat-paginator
+      [length]="total()"
+      [pageSize]="pageSize()"
+      [pageIndex]="pageIndex()"
+      [pageSizeOptions]="[5, 10, 20]"
+      [showFirstLastButtons]="true"
+      (page)="alCambiarPagina($event)"
+      aria-label="Paginación de publicaciones"
+    />
+  }
+</section>
