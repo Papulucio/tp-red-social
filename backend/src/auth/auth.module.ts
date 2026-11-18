@@ -14,7 +14,7 @@ import { AuthService } from './auth.service.js';
       useFactory: (config: ConfigService) => ({
         secret: config.get<string>('JWT_SECRET') ?? 'red-social-secret',
         signOptions: {
-          expiresIn: Number(config.get<string>('JWT_EXPIRES_IN') ?? 604800),
+          expiresIn: '15m',
         },
       }),
     }),

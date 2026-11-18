@@ -12,7 +12,9 @@ import {
   RouterOutlet,
 } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
+import { SessionExpiryService } from './core/services/session-expiry.service';
 import { urlImagen } from './core/utils/asset-url';
+import { SplashComponent } from './shared/splash/splash.component';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +28,7 @@ import { urlImagen } from './core/utils/asset-url';
     MatMenuModule,
     MatDividerModule,
     MatChipsModule,
+    SplashComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -34,6 +37,11 @@ export class App {
   readonly auth = inject(AuthService);
   readonly urlImagen = urlImagen;
   private readonly router = inject(Router);
+
+  constructor() {
+    inject(SessionExpiryService);
+    this.auth.inicializar();
+  }
 
   cerrarSesion(): void {
     this.auth.logout();

@@ -9,6 +9,11 @@ import { UserDocument } from '../users/schemas/user.schema.js';
 import { UsersService } from '../users/users.service.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RegistroDto } from './dto/registro.dto.js';
+import {
+  type JwtPayload,
+  type PayloadSinNormalizar,
+  normalizarPayload,
+} from './utils/token.util.js';
 
 @Injectable()
 export class AuthService {
@@ -66,12 +71,49 @@ export class AuthService {
     };
   }
 
+  async autorizar(token: string) {
+    const payload = this.verificar(token);
+
+    let usuario: UserDocument;
+    try {
+      usuario = await this.usersService.findById(payload.uuid);
+    } catch {
+      throw new UnauthorizedException('Token inválido o expirado');
+    }
+
+    return {
+      uuid: payload.uuid,
+      correo: payload.correo,
+      nombreUsuario: payload.nombreUsuario,
+      rol: payload.rol,
+      usuario: usuario.toJSON(),
+    };
+  }
+
+  refrescar(token: string) {
+    const payload = this.verificar(token);
+    return { token: this.jwtService.sign(payload) };
+  }
+
   private signToken(user: UserDocument): string {
     return this.jwtService.sign({
-      sub: user._id.toString(),
+      uuid: user._id.toString(),
       nombreUsuario: user.nombreUsuario,
       correo: user.correo,
-      perfil: user.perfil,
+      rol: user.perfil,
     });
+  }
+
+  private verificar(token: string): JwtPayload {
+    try {
+      return normalizarPayload(
+        this.jwtService.verify<PayloadSinNormalizar>(token),
+      );
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new UnauthorizedException('Token inválido o expirado');
+    }
   }
 }

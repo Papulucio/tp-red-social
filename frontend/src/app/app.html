@@ -1,3 +1,4 @@
+@if (auth.inicializado()) {
 <mat-toolbar class="app-toolbar">
   <a class="app-toolbar__brand" routerLink="/publicaciones" aria-label="Ir al inicio de Red Social">
     <mat-icon aria-hidden="true">hub</mat-icon>
@@ -70,3 +71,6 @@
 <main class="app-main">
   <router-outlet />
 </main>
+} @else {
+  <app-splash />
+}

@@ -9,6 +9,18 @@
   box-shadow: var(--mat-sys-level2);
 }
 
+.publicacion--detalle .publicacion__titulo {
+  font-size: 1.6rem;
+}
+
+.publicacion--detalle .publicacion__mensaje {
+  font-size: 1.05rem;
+}
+
+.publicacion--detalle .publicacion__imagen {
+  max-height: none;
+}
+
 .publicacion__cabecera {
   display: flex;
   align-items: center;
@@ -139,6 +151,13 @@
   flex-shrink: 0;
   font-size: 0.7rem;
   color: var(--mat-sys-on-surface-variant);
+  text-align: right;
+}
+
+.comentarios__editado {
+  display: block;
+  font-style: italic;
+  color: var(--mat-sys-primary);
 }
 
 .comentarios__vacio {

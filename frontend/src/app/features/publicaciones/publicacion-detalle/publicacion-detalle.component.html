@@ -1,0 +1,148 @@
+@if (cargando()) {
+  <div class="detalle__cargando" role="status" aria-live="polite">
+    <mat-spinner diameter="44" aria-label="Cargando publicación" />
+  </div>
+} @else if (post(); as publicacion) {
+  <section class="detalle">
+    <button mat-button type="button" class="detalle__volver" (click)="volver()">
+      <mat-icon aria-hidden="true">arrow_back</mat-icon>
+      Volver a publicaciones
+    </button>
+
+    <app-publicacion-card
+      [post]="publicacion"
+      [currentUser]="auth.currentUser()"
+      [modoDetalle]="true"
+      [mostrarComentariosInline]="false"
+      [comentariosCount]="total()"
+      (actualizado)="actualizarPost($event)"
+      (eliminado)="volver()"
+    />
+
+    <mat-card class="comentarios" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Comentarios</mat-card-title>
+        <mat-card-subtitle>{{ total() }} comentarios</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        @if (auth.isLoggedIn()) {
+          <div class="comentarios__form">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Escribí un comentario</mat-label>
+              <textarea
+                matInput
+                rows="2"
+                maxlength="500"
+                [ngModel]="nuevoComentario()"
+                (ngModelChange)="nuevoComentario.set($event)"
+                (keyup.enter)="enviarComentario()"
+              ></textarea>
+            </mat-form-field>
+            <button
+              mat-flat-button
+              color="primary"
+              type="button"
+              [disabled]="enviando() || !nuevoComentario().trim()"
+              (click)="enviarComentario()"
+            >
+              @if (enviando()) {
+                <mat-spinner diameter="18" aria-label="Enviando comentario" />
+              } @else {
+                Enviar
+              }
+            </button>
+          </div>
+          <mat-divider />
+        }
+
+        @if (comentarios().length > 0) {
+          <ul class="comentarios__lista">
+            @for (comentario of comentarios(); track comentario._id || $index) {
+              <li class="comentarios__item">
+                <div class="comentarios__cabecera">
+                  <strong>{{ nombreAutor(comentario) }}</strong>
+                  <span>{{ usuarioAutor(comentario) }}</span>
+                  <span class="comentarios__fecha">
+                    {{ comentario.fecha | date: 'short' }}
+                  </span>
+                  @if (comentario.modificado) {
+                    <span class="comentarios__editado">Editado</span>
+                  }
+                  @if (puedeEditar(comentario) && editandoId() !== comentario._id) {
+                    <button
+                      mat-button
+                      type="button"
+                      class="comentarios__editar"
+                      (click)="empezarEdicion(comentario)"
+                    >
+                      <mat-icon aria-hidden="true">edit</mat-icon>
+                      Editar
+                    </button>
+                  }
+                </div>
+
+                @if (editandoId() === comentario._id) {
+                  <div class="comentarios__editor">
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                      <mat-label>Editar comentario</mat-label>
+                      <textarea
+                        matInput
+                        rows="2"
+                        maxlength="500"
+                        [ngModel]="textoEdicion()"
+                        (ngModelChange)="textoEdicion.set($event)"
+                      ></textarea>
+                    </mat-form-field>
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      type="button"
+                      [disabled]="guardandoEdicion() || !textoEdicion().trim()"
+                      (click)="guardarEdicion(comentario)"
+                    >
+                      Guardar
+                    </button>
+                    <button
+                      mat-button
+                      type="button"
+                      [disabled]="guardandoEdicion()"
+                      (click)="cancelarEdicion()"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                } @else {
+                  <p class="comentarios__texto">{{ comentario.texto }}</p>
+                }
+              </li>
+            }
+          </ul>
+
+          @if (hasMore()) {
+            <div class="comentarios__mas">
+              <button
+                mat-stroked-button
+                type="button"
+                [disabled]="cargandoMas()"
+                (click)="cargarMas()"
+              >
+                @if (cargandoMas()) {
+                  <mat-spinner diameter="18" aria-label="Cargando más comentarios" />
+                } @else {
+                  Cargar más
+                }
+              </button>
+            </div>
+          }
+        } @else {
+          <p class="comentarios__vacio">
+            Todavía no hay comentarios. ¡Sé el primero!
+          </p>
+        }
+      </mat-card-content>
+    </mat-card>
+  </section>
+} @else {
+  <p class="detalle__error">No se pudo cargar la publicación.</p>
+}

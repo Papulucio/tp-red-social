@@ -23,7 +23,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401 && token && !esRutaPublica) {
         auth.logout();
-        void router.navigate(['/login']);
+        if (!auth.inicializando() && router.url !== '/login') {
+          void router.navigate(['/login']);
+        }
       }
       return throwError(() => error);
     }),

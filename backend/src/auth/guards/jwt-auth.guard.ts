@@ -7,13 +7,11 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
 import type { AuthUser } from '../interfaces/auth-user.interface.js';
-
-interface JwtPayload {
-  sub: string;
-  nombreUsuario: string;
-  correo: string;
-  perfil: string;
-}
+import {
+  type PayloadSinNormalizar,
+  extraerBearer,
+  normalizarPayload,
+} from '../utils/token.util.js';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -21,21 +19,17 @@ export class JwtAuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
-    const header = request.headers.authorization;
-
-    if (!header || !header.startsWith('Bearer ')) {
-      throw new UnauthorizedException('Token de acceso faltante');
-    }
-
-    const token = header.slice(7).trim();
+    const token = extraerBearer(request.headers.authorization);
 
     try {
-      const payload = this.jwtService.verify<JwtPayload>(token);
+      const payload = normalizarPayload(
+        this.jwtService.verify<PayloadSinNormalizar>(token),
+      );
       const user: AuthUser = {
-        userId: payload.sub,
+        userId: payload.uuid,
         nombreUsuario: payload.nombreUsuario,
         correo: payload.correo,
-        perfil: payload.perfil,
+        perfil: payload.rol,
       };
       (request as Request & { user: AuthUser }).user = user;
       return true;

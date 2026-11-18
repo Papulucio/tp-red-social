@@ -6,10 +6,11 @@ export type AutorResumen = Pick<
 >;
 
 export interface Comentario {
-  _id?: string;
+  _id: string;
   autor: AutorResumen | string;
   texto: string;
   fecha: string;
+  modificado: boolean;
 }
 
 export interface Post {
@@ -30,4 +31,12 @@ export interface PostListResponse {
   offset: number;
   limit: number;
   publicaciones: Post[];
+}
+
+export interface ComentariosResponse {
+  total: number;
+  offset: number;
+  limit: number;
+  hasMore: boolean;
+  comentarios: Comentario[];
 }

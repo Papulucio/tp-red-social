@@ -29,6 +29,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'publicacion/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import(
+        './features/publicaciones/publicacion-detalle/publicacion-detalle.component'
+      ).then((m) => m.PublicacionDetalleComponent),
+  },
+  {
     path: 'mi-perfil',
     canActivate: [authGuard],
     loadComponent: () =>

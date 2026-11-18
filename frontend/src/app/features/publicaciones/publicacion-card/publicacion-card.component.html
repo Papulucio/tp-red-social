@@ -1,4 +1,8 @@
-<mat-card class="publicacion" appearance="outlined">
+<mat-card
+  class="publicacion"
+  [class.publicacion--detalle]="modoDetalle()"
+  appearance="outlined"
+>
   <div class="publicacion__cabecera">
     <div class="publicacion__avatar">
       @if (imagenAutor(post().autor)) {
@@ -57,11 +61,22 @@
 
     <button mat-button type="button" (click)="alternarComentarios()" aria-label="Ver comentarios">
       <mat-icon aria-hidden="true">chat_bubble_outline</mat-icon>
-      <span>{{ post().comentarios.length }}</span>
+      <span>{{ comentariosCount() ?? post().comentarios.length }}</span>
     </button>
+
+    @if (!modoDetalle()) {
+      <a
+        mat-button
+        [routerLink]="['/publicacion', post()._id]"
+        aria-label="Ver publicación completa"
+      >
+        <mat-icon aria-hidden="true">open_in_full</mat-icon>
+        <span>Ver detalle</span>
+      </a>
+    }
   </mat-card-actions>
 
-  @if (mostrarComentarios()) {
+  @if (mostrarComentariosInline() && mostrarComentarios()) {
     <mat-divider />
     <div class="comentarios">
       @if (post().comentarios.length > 0) {
@@ -72,7 +87,12 @@
                 <strong>{{ nombreComentario(comentario) }}</strong>
                 <span>{{ comentario.texto }}</span>
               </div>
-              <span class="comentarios__fecha">{{ comentario.fecha | date: 'short' }}</span>
+              <span class="comentarios__fecha">
+                {{ comentario.fecha | date: 'short' }}
+                @if (comentario.modificado) {
+                  <span class="comentarios__editado">Editado</span>
+                }
+              </span>
             </li>
           }
         </ul>

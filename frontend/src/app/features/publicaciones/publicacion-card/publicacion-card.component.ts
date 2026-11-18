@@ -8,6 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -37,6 +38,7 @@ import { ConfirmService } from '../../../shared/confirm-dialog/confirm.service';
     MatInputModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    RouterLink,
   ],
   templateUrl: './publicacion-card.component.html',
   styleUrl: './publicacion-card.component.css',
@@ -44,6 +46,9 @@ import { ConfirmService } from '../../../shared/confirm-dialog/confirm.service';
 export class PublicacionCardComponent {
   readonly post = input.required<Post>();
   readonly currentUser = input<User | null>(null);
+  readonly modoDetalle = input(false);
+  readonly mostrarComentariosInline = input(true);
+  readonly comentariosCount = input<number | null>(null);
 
   readonly actualizado = output<Post>();
   readonly eliminado = output<string>();
@@ -136,11 +141,15 @@ export class PublicacionCardComponent {
     }
     this.enviandoComentario.set(true);
     this.postService.comentar(this.post()._id, texto).subscribe({
-      next: (postActualizado) => {
+      next: (comentario) => {
+        const publicacion = this.post();
         this.enviandoComentario.set(false);
         this.nuevoComentario.set('');
         this.mostrarComentarios.set(true);
-        this.actualizado.emit(postActualizado);
+        this.actualizado.emit({
+          ...publicacion,
+          comentarios: [comentario, ...publicacion.comentarios],
+        });
         this.notificacion.success('Comentario agregado');
       },
       error: (error: unknown) => {
