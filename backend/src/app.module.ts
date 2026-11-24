@@ -7,6 +7,7 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
 import { PostsModule } from './posts/posts.module.js';
+import { StatsModule } from './stats/stats.module.js';
 import { UsersModule } from './users/users.module.js';
 
 @Module({
@@ -26,6 +27,7 @@ import { UsersModule } from './users/users.module.js';
     UsersModule,
     AuthModule,
     PostsModule,
+    StatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,0 +1,177 @@
+<section class="app-container dashboard">
+  <header class="dashboard__header">
+    <div>
+      <h1>Administración de usuarios</h1>
+      <p>Gestioná cuentas, perfiles y estado de acceso.</p>
+    </div>
+  </header>
+
+  <div class="dashboard__grid">
+    <mat-card appearance="outlined" class="panel">
+      <mat-card-header>
+        <mat-card-title>Crear usuario</mat-card-title>
+        <mat-card-subtitle>Alta con perfil usuario o administrador</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="crearUsuario()" class="form" novalidate>
+          <div class="form__row">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre</mat-label>
+              <input matInput formControlName="nombre" />
+              @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+                <mat-error>Nombre requerido</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Apellido</mat-label>
+              <input matInput formControlName="apellido" />
+              @if (form.controls.apellido.touched && form.controls.apellido.invalid) {
+                <mat-error>Apellido requerido</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Correo</mat-label>
+            <input matInput formControlName="correo" type="email" />
+            @if (form.controls.correo.touched && form.controls.correo.invalid) {
+              <mat-error>Correo inválido</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre de usuario</mat-label>
+            <input matInput formControlName="nombreUsuario" />
+            @if (form.controls.nombreUsuario.touched && form.controls.nombreUsuario.invalid) {
+              <mat-error>3-20 caracteres: letras, números, _ o .</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="form__row">
+            <mat-form-field appearance="outline">
+              <mat-label>Contraseña</mat-label>
+              <input matInput formControlName="password" [type]="ocultarPassword() ? 'password' : 'text'" />
+              <button mat-icon-button matSuffix type="button" (click)="ocultarPassword.set(!ocultarPassword())">
+                <mat-icon>{{ ocultarPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              @if (form.controls.password.touched && form.controls.password.invalid) {
+                <mat-error>8+ caracteres, 1 mayúscula y 1 número</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Repetir contraseña</mat-label>
+              <input matInput formControlName="repetirPassword" [type]="ocultarRepetir() ? 'password' : 'text'" />
+              <button mat-icon-button matSuffix type="button" (click)="ocultarRepetir.set(!ocultarRepetir())">
+                <mat-icon>{{ ocultarRepetir() ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              @if (form.touched && form.hasError('passwordsNoCoinciden')) {
+                <mat-error>Las contraseñas no coinciden</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form__row">
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha de nacimiento</mat-label>
+              <input matInput formControlName="fechaNacimiento" type="date" />
+            </mat-form-field>
+            <div class="perfil-radio">
+              <label class="perfil-radio__label">Perfil</label>
+              <mat-radio-group formControlName="perfil" aria-label="Perfil del usuario">
+                <mat-radio-button value="usuario">Usuario</mat-radio-button>
+                <mat-radio-button value="administrador">Administrador</mat-radio-button>
+              </mat-radio-group>
+            </div>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Descripción breve</mat-label>
+            <textarea matInput formControlName="descripcion" rows="2" maxlength="200"></textarea>
+          </mat-form-field>
+
+          <div class="imagen-campo">
+            <label class="imagen-campo__label" for="imagenPerfilAdmin">Imagen de perfil (opcional)</label>
+            <input #imgInput id="imagenPerfilAdmin" type="file" accept="image/*" (change)="seleccionarArchivo($event)" />
+            @if (previsualizacion(); as prev) {
+              <div class="imagen-campo__preview">
+                <img [src]="prev" alt="Previsualización" />
+                <button mat-button type="button" (click)="quitarImagen(imgInput)">Quitar</button>
+              </div>
+            }
+          </div>
+
+          <button mat-flat-button color="primary" type="submit" [disabled]="guardando()">
+            @if (guardando()) { <mat-spinner diameter="18" /> } @else { Crear usuario }
+          </button>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card appearance="outlined" class="panel">
+      <mat-card-header>
+        <mat-card-title>Usuarios registrados</mat-card-title>
+        <mat-card-subtitle>{{ usuarios().length }} usuarios</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        @if (cargando()) {
+          <div class="estado"><mat-spinner diameter="40" /></div>
+        } @else {
+          <div class="tabla-wrap">
+            <table mat-table [dataSource]="usuarios()" class="tabla">
+              <ng-container matColumnDef="usuario">
+                <th mat-header-cell *matHeaderCellDef>Usuario</th>
+                <td mat-cell *matCellDef="let u" [appResaltarEstado]="u.activo !== false">
+                  <div class="usuario-cell">
+                    @if (u.imagenPerfil) {
+                      <img class="avatar" [src]="urlImagen(u.imagenPerfil)" [alt]="u.nombreUsuario" appImagenFallback />
+                    } @else {
+                      <div class="avatar avatar--placeholder"><mat-icon>person</mat-icon></div>
+                    }
+                    <div>
+                      <strong>{{ u.nombre }} {{ u.apellido }}</strong>
+                      <span>&#64;{{ u.nombreUsuario }}</span>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="correo">
+                <th mat-header-cell *matHeaderCellDef>Correo</th>
+                <td mat-cell *matCellDef="let u" [appResaltarEstado]="u.activo !== false">{{ u.correo }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="perfil">
+                <th mat-header-cell *matHeaderCellDef>Perfil</th>
+                <td mat-cell *matCellDef="let u" [appResaltarEstado]="u.activo !== false">
+                  <mat-chip-set><mat-chip [highlighted]="u.perfil === 'administrador'">{{ u.perfil }}</mat-chip></mat-chip-set>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let u" [appResaltarEstado]="u.activo !== false">
+                  <span class="estado-badge" [class.estado-badge--inactivo]="u.activo === false">
+                    {{ u.activo | estadoUsuario }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let u" [appResaltarEstado]="u.activo !== false">
+                  <button mat-stroked-button type="button" [color]="u.activo === false ? 'primary' : 'warn'"
+                    (click)="cambiarEstado(u)">
+                    {{ u.activo === false ? 'Habilitar' : 'Deshabilitar' }}
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+              <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
+            </table>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

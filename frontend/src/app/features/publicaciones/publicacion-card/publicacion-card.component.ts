@@ -24,6 +24,9 @@ import { PostService } from '../../../core/services/post.service';
 import { urlImagen } from '../../../core/utils/asset-url';
 import { extraerMensajeError } from '../../../core/utils/error-message';
 import { ConfirmService } from '../../../shared/confirm-dialog/confirm.service';
+import { ImagenFallbackDirective } from '../../../shared/directives/imagen-fallback.directive';
+import { TiempoRelativoPipe } from '../../../shared/pipes/tiempo-relativo.pipe';
+import { TruncarTextoPipe } from '../../../shared/pipes/truncar-texto.pipe';
 
 @Component({
   selector: 'app-publicacion-card',
@@ -39,6 +42,9 @@ import { ConfirmService } from '../../../shared/confirm-dialog/confirm.service';
     MatProgressSpinnerModule,
     MatTooltipModule,
     RouterLink,
+    ImagenFallbackDirective,
+    TiempoRelativoPipe,
+    TruncarTextoPipe,
   ],
   templateUrl: './publicacion-card.component.html',
   styleUrl: './publicacion-card.component.css',

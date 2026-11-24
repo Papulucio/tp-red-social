@@ -1,0 +1,21 @@
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { map } from 'rxjs';
+import { AuthService } from '../services/auth.service';
+
+export const adminGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  return auth.cuandoInicializado$.pipe(
+    map(() => {
+      const usuario = auth.currentUser();
+      if (!usuario) {
+        return router.createUrlTree(['/login']);
+      }
+      return usuario.perfil === 'administrador'
+        ? true
+        : router.createUrlTree(['/publicaciones']);
+    }),
+  );
+};

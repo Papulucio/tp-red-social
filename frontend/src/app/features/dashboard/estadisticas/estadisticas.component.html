@@ -1,0 +1,79 @@
+<section class="app-container dashboard">
+  <header class="dashboard__header">
+    <div>
+      <h1>Estadísticas</h1>
+      <p>Métricas de publicaciones y comentarios por rango de fechas.</p>
+    </div>
+  </header>
+
+  <mat-card appearance="outlined" class="filtros">
+    <mat-card-content class="filtros__content">
+      <mat-form-field appearance="outline">
+        <mat-label>Desde</mat-label>
+        <input matInput type="date" [ngModel]="fechaInicio()" (ngModelChange)="fechaInicio.set($event)" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Hasta</mat-label>
+        <input matInput type="date" [ngModel]="fechaFin()" (ngModelChange)="fechaFin.set($event)" />
+      </mat-form-field>
+      <button mat-flat-button color="primary" type="button" (click)="cargar()" [disabled]="cargando()">
+        <mat-icon aria-hidden="true">refresh</mat-icon>
+        Actualizar
+      </button>
+    </mat-card-content>
+  </mat-card>
+
+  @if (cargando()) {
+    <div class="estado"><mat-spinner diameter="44" /></div>
+  } @else {
+    <div class="charts-grid">
+      <mat-card appearance="outlined" class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Publicaciones por usuario</mat-card-title>
+          <mat-card-subtitle>Cantidad de publicaciones en el período</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-wrap">
+            @if (barData().labels?.length) {
+              <canvas baseChart [type]="'bar'" [data]="barData()" [options]="barOptions"></canvas>
+            } @else {
+              <p class="sin-datos">Sin datos en el rango seleccionado.</p>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Comentarios en el tiempo</mat-card-title>
+          <mat-card-subtitle>Evolución diaria de comentarios</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-wrap">
+            @if (lineData().labels?.length) {
+              <canvas baseChart [type]="'line'" [data]="lineData()" [options]="lineOptions"></canvas>
+            } @else {
+              <p class="sin-datos">Sin datos en el rango seleccionado.</p>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="chart-card chart-card--wide">
+        <mat-card-header>
+          <mat-card-title>Comentarios por publicación</mat-card-title>
+          <mat-card-subtitle>Distribución de comentarios en publicaciones</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-wrap chart-wrap--doughnut">
+            @if (doughnutData().labels?.length) {
+              <canvas baseChart [type]="'doughnut'" [data]="doughnutData()" [options]="doughnutOptions"></canvas>
+            } @else {
+              <p class="sin-datos">Sin datos en el rango seleccionado.</p>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+</section>

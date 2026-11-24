@@ -59,6 +59,12 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
+    if (user.activo === false) {
+      throw new UnauthorizedException(
+        'Tu cuenta está deshabilitada. Contactá al administrador.',
+      );
+    }
+
     const coincide = await bcrypt.compare(dto.password, user.password);
 
     if (!coincide) {
@@ -79,6 +85,12 @@ export class AuthService {
       usuario = await this.usersService.findById(payload.uuid);
     } catch {
       throw new UnauthorizedException('Token inválido o expirado');
+    }
+
+    if (usuario.activo === false) {
+      throw new UnauthorizedException(
+        'Tu cuenta está deshabilitada. Contactá al administrador.',
+      );
     }
 
     return {

@@ -13,6 +13,7 @@ export interface CreateUserData {
   descripcion?: string;
   imagenPerfil?: string;
   perfil?: Perfil;
+  activo?: boolean;
 }
 
 export interface UpdateUserData {
@@ -62,6 +63,16 @@ export class UsersService {
       throw new NotFoundException('Usuario no encontrado');
     }
     return user;
+  }
+
+  async findAll(): Promise<UserDocument[]> {
+    return this.userModel.find().sort({ createdAt: -1 }).exec();
+  }
+
+  async setActivo(id: string, activo: boolean): Promise<UserDocument> {
+    const user = await this.findById(id);
+    user.activo = activo;
+    return user.save();
   }
 
   async update(id: string, data: UpdateUserData): Promise<UserDocument> {

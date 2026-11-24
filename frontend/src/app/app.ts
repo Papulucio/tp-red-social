@@ -14,6 +14,7 @@ import {
 import { AuthService } from './core/services/auth.service';
 import { SessionExpiryService } from './core/services/session-expiry.service';
 import { urlImagen } from './core/utils/asset-url';
+import { SoloAdminDirective } from './shared/directives/solo-admin.directive';
 import { SplashComponent } from './shared/splash/splash.component';
 
 @Component({
@@ -29,6 +30,7 @@ import { SplashComponent } from './shared/splash/splash.component';
     MatDividerModule,
     MatChipsModule,
     SplashComponent,
+    SoloAdminDirective,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

@@ -6,7 +6,7 @@
   <div class="publicacion__cabecera">
     <div class="publicacion__avatar">
       @if (imagenAutor(post().autor)) {
-        <img [src]="imagenAutor(post().autor)" [alt]="'Foto de ' + nombreAutor(post().autor)" />
+        <img [src]="imagenAutor(post().autor)" [alt]="'Foto de ' + nombreAutor(post().autor)" appImagenFallback />
       } @else {
         <span aria-hidden="true">{{ inicialesAutor(post().autor) }}</span>
       }
@@ -15,7 +15,7 @@
       <strong>{{ nombreAutor(post().autor) }}</strong>
       <span>{{ usuarioAutor(post().autor) }}</span>
     </div>
-    <span class="publicacion__fecha">{{ post().createdAt | date: 'short' }}</span>
+    <span class="publicacion__fecha" [matTooltip]="post().createdAt | date: 'short'">{{ post().createdAt | tiempoRelativo }}</span>
 
     @if (puedeEliminar()) {
       <button
@@ -33,13 +33,14 @@
 
   <mat-card-content class="publicacion__contenido">
     <h3 class="publicacion__titulo">{{ post().titulo }}</h3>
-    <p class="publicacion__mensaje">{{ post().mensaje }}</p>
+    <p class="publicacion__mensaje">{{ modoDetalle() ? post().mensaje : (post().mensaje | truncarTexto:220) }}</p>
     @if (post().imagenUrl) {
       <img
         class="publicacion__imagen"
         [src]="urlImagen(post().imagenUrl)"
         alt="Imagen de la publicación"
         loading="lazy"
+        appImagenFallback
       />
     }
   </mat-card-content>

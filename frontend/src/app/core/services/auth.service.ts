@@ -36,6 +36,9 @@ export class AuthService {
 
   readonly currentUser = this._currentUser.asReadonly();
   readonly isLoggedIn = computed(() => this._currentUser() !== null);
+  readonly isAdmin = computed(
+    () => this._currentUser()?.perfil === 'administrador',
+  );
   readonly inicializado = this._inicializado.asReadonly();
   readonly inicializando = signal(false);
   readonly cuandoInicializado$ = this.inicializadoSubject.pipe(
